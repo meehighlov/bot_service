@@ -1,7 +1,7 @@
 from service.api.v1.blueprint import v1_blueprint
 from flask import jsonify
 
-from service.app.vk.subscriptions import get_count_unsubscribed_users, get_unsubscribed_user_ids
+from service.app.vk.subscriptions import get_unsubscribed_users_info
 
 
 @v1_blueprint.route('/health', methods=['GET'])
@@ -11,9 +11,9 @@ def health():
 
 @v1_blueprint.route('/unsub/count', methods=['GET'])
 def unsubscribed_users_count():
-    return jsonify({'count': get_count_unsubscribed_users()})
+    return jsonify({'count': get_unsubscribed_users_info('count')})
 
 
 @v1_blueprint.route('/unsub/ids', methods=['GET'])
 def unsubscribed_user_ids():
-    return jsonify({'ids': get_unsubscribed_user_ids()})
+    return jsonify({'ids': get_unsubscribed_users_info('items')})
