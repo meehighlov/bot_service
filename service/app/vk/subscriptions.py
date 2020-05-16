@@ -7,12 +7,12 @@ def get_unsubscribed_users_info(query: str = None):
     return subs[query] if query is not None else subs
 
 
-def cancel_specified_friends_request():
+def drop_all_friends_request():
     api = get_api()
     subs = get_unsubscribed_users_info()
 
     delete_result = [
-        api.friends.delete(user_id)
+        api.friends.delete(user_id=user_id)
         for user_id in subs['items']
     ]
 
