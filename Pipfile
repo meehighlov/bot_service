@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
+python-dotenv = "*"
 
 [packages]
 flask = "*"
@@ -12,6 +13,7 @@ sqlalchemy = "*"
 marshmallow = "*"
 pytest = "*"
 requests = "*"
+celery = "*"
 
 [requires]
 python_version = "3.8"
