@@ -10,6 +10,7 @@ session = vk_api.VkApi(
 )
 
 
+# TODO check if vk auth is executed only when token is expired, otherwise make it singleton
 def auth_vk():
     os.environ['session_state'] = 'inactive'
     try:
