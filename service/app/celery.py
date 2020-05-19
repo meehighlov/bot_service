@@ -3,7 +3,7 @@ import celery
 from service.app.config import config
 
 app = celery.Celery(
-    'celery',
+    'service.app',
     broker=config.CELERY_BROKER_URL,
     include=[
         'service.worker',
