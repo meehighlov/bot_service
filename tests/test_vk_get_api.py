@@ -2,7 +2,7 @@ from unittest import mock
 
 from vk_api import VkApi
 
-from service.app.vk.auth import auth_vk
+from service.app.vk.auth import get_api
 
 
 @mock.patch.object(VkApi, 'auth')
@@ -12,8 +12,7 @@ def test_auth_vk(
         auth_mock
 ):
 
-    login, password = 'login', 'password'
-    vk_api = auth_vk(login, password)
+    vk_api = get_api()
 
     assert auth_mock.call_count == 1
     assert api_mock.call_count == 1

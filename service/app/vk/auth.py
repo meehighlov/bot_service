@@ -3,21 +3,18 @@ import vk_api
 from service.app.config import config
 
 
-session = vk_api.VkApi(
-    config.VK_LOGIN,
-    config.VK_PASSWORD
-)
-
-
-def auth_vk():
+def auth_vk(session):
     try:
         session.auth(token_only=True)
-        print('new auth')
     except vk_api.AuthError:
-        print('Ошибка аутентификации')
+        # log it or something
         raise
 
 
 def get_api():
-    auth_vk()
+    session = vk_api.VkApi(
+        config.VK_LOGIN,
+        config.VK_PASSWORD
+    )
+    auth_vk(session)
     return session.get_api()
