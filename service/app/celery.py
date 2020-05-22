@@ -3,7 +3,7 @@ import celery
 from service.app.config import config
 
 app = celery.Celery(
-    'service.app',
+    'bot_service',
     broker=config.CELERY_BROKER_URL,
     include=[
         'service.worker',
@@ -13,7 +13,7 @@ app = celery.Celery(
 app.conf.beat_schedule = {
     'unlink_unsubscribed_users': {
         'task': 'service.worker.tasks.unlink_unsubscribed_users_task',
-        'schedule': config.WORKER_SLEEP_TIME_SECONDS
+        'schedule': int(config.WORKER_SLEEP_TIME_SECONDS)
     }
 }
 

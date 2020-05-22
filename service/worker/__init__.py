@@ -1,1 +1,1 @@
-from service.worker import *
+from service.worker import tasks
