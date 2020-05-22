@@ -13,7 +13,7 @@ app = celery.Celery(
 app.conf.beat_schedule = {
     'unlink_unsubscribed_users': {
         'task': 'service.worker.tasks.unlink_unsubscribed_users_task',
-        'schedule': int(config.WORKER_SLEEP_TIME_SECONDS)
+        'schedule': config.WORKER_SLEEP_TIME_SECONDS
     }
 }
 
