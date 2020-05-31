@@ -31,7 +31,7 @@ def chat_view():
             'message': 'stub message',
             'peer_id': user_sender,
             'access_token': config.BOT_TOKEN,
-            'v': '5.103',
+            'v': config.VK_API_VERSION,
             'random_id': '0'
         }
 
