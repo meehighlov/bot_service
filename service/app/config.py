@@ -8,6 +8,7 @@ load_dotenv(verbose=True)
 class Config:
     APP_NAME = os.getenv('APP_NAME', 'bot')
 
+    VK_API_URL = os.getenv('VK_API_URL')
     VK_LOGIN = os.getenv('VK_LOGIN')
     VK_PASSWORD = os.getenv('VK_PASSWORD')
     BOT_TOKEN = os.getenv('BOT_TOKEN')
