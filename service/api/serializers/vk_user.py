@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, pre_load
+from marshmallow import Schema, fields, post_load
 
 
 class VKUserSchema(Schema):
@@ -8,9 +8,12 @@ class VKUserSchema(Schema):
     is_closed = fields.Boolean(allow_none=True)
     can_access_closed = fields.Boolean(allow_none=True)
 
-    @pre_load
-    def process_additional_fields(self, data, **kwargs):
-        pass
+    @post_load(pass_original=True)
+    def process_additional_fields(self, data, original, **kwargs):
+        uncaught_fields = set(original) - set(data)
+        for field_name in uncaught_fields:
+            data[field_name] = original[field_name]
+        return data
 
 
 class VKUsersSchema(Schema):
