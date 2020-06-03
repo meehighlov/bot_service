@@ -5,6 +5,7 @@ from flask import jsonify
 from flask import request
 
 from service.app.config import config
+from service.app.vk.chat_scenario import get_answer
 from service.app.vk.users import get_user_by_id
 
 
@@ -17,21 +18,21 @@ def health():
 def chat_view():
     data = request.get_json()
 
+    print(data)
+
     if data['type'] == 'confirmation':
         return config.CONFIRMATION_CODE
 
     if data['type'] == 'message_new':
         user_sender_id = data['object']['message']['from_id']
 
-        user_sender_data = get_user_by_id(user_sender_id)
-        user_name = user_sender_data['first_name']
-        if not user_name:
-            user_name = 'stranger'
+        # user_sender_data = get_user_by_id(user_sender_id)
+        # print(user_sender_data)
+
+        response = get_answer(data)
 
         response_data = {
-            'message': f'Hi, {user_name},'
-                       f' i\'m not ready to chat with you yet,'
-                       f' but you can converse with public administrator',
+            'message': response,
             'peer_id': user_sender_id,
             'access_token': config.BOT_TOKEN,
             'v': config.VK_API_VERSION,

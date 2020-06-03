@@ -17,4 +17,4 @@ class VKUserSchema(Schema):
 
 
 class VKUsersSchema(Schema):
-    response = fields.Nested(VKUserSchema, many=True)
+    response = fields.List(fields.Nested(VKUserSchema))

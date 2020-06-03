@@ -1,6 +1,6 @@
 import requests
 
-from service.api.serializers.vk_user import VKUserSchema
+from service.api.serializers.vk_user import VKUsersSchema
 from service.app.config import config
 
 url_tail = 'users.get'
@@ -18,11 +18,15 @@ def get_user_by_id(user_id):
     user_id = str(user_id)
     params = {
         'user_id': user_id,
+        'access_token': config.BOT_TOKEN,
+        'v': config.VK_API_VERSION,
+        'random_id': '0'
     }
 
     response = requests.get(f'{config.VK_API_URL}{url_tail}', params=params)
 
-    return VKUserSchema().load(response.json()).data
+    # TODO fix this! does not work
+    return VKUsersSchema().load(response.json()).data
 
 
 def get_users(params: dict):
