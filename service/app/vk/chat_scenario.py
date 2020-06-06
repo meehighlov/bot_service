@@ -11,7 +11,50 @@ class BaseChatScenario:
         pass
 
     def keyboard(self):
-        pass
+        return {
+            "one_time": False,
+            "buttons": [
+                [
+                    {
+                        "action": {
+                            "type": "text",
+                            "payload": {"button": "5"},
+                            "label": "another but"
+                        },
+                        "color": "secondary"
+                    }
+                ],
+                [{
+                    "action": {
+                        "type": "text",
+                        "payload": "{\"button\": \"1\"}",
+                        "label": "Negative"
+                    },
+                    "color": "negative"
+                }, {
+                    "action": {
+                        "type": "text",
+                        "payload": "{\"button\": \"2\"}",
+                        "label": "Positive"
+                    },
+                    "color": "positive"
+                }, {
+                    "action": {
+                        "type": "text",
+                        "payload": "{\"button\": \"2\"}",
+                        "label": "Primary"
+                    },
+                    "color": "primary"
+                }, {
+                    "action": {
+                        "type": "text",
+                        "payload": "{\"button\": \"2\"}",
+                        "label": "Secondary"
+                    },
+                    "color": "secondary"
+                }]
+            ]
+        }
 
 
 class MeScenario(BaseChatScenario):
@@ -31,10 +74,10 @@ def get_scenario_by_user_id(user_id: str):
 
 def get_answer(request_data: dict):
     user_sender_id = request_data['object']['message']['from_id']
-    scenario = get_scenario_by_user_id(f'{user_sender_id}')
+    scenario = get_scenario_by_user_id(f'{user_sender_id}')()
 
-    answer = scenario().answer(request_data)
+    answer = 'mocked message'
 
     # user_sender_data = get_user_by_id(user_sender_id)
 
-    return answer
+    return answer, scenario.keyboard()

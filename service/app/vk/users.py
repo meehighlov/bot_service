@@ -25,9 +25,4 @@ def get_user_by_id(user_id):
 
     response = requests.get(f'{config.VK_API_URL}{url_tail}', params=params)
 
-    # TODO fix this! does not work
-    return VKUsersSchema().load(response.json()).data
-
-
-def get_users(params: dict):
-    pass
+    return VKUsersSchema().load(response.json())
