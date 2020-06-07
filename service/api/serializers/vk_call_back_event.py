@@ -22,12 +22,6 @@ class VKCallBackAPIMessage(Schema):
     class Meta:
         unknown = INCLUDE
 
-    @post_load
-    def extract_payload(self, data, **kwargs):
-        if 'payload' in data:
-            data['payload'] = json.loads(data['payload'])
-        return data
-
 
 class VKCallBackAPIObject(Schema):
     message = fields.Nested(VKCallBackAPIMessage)
@@ -44,3 +38,11 @@ class VKCallBackAPIEvent(Schema):
 
     class Meta:
         unknown = INCLUDE
+
+    @post_load
+    def extract_payload(self, data, **kwargs):
+        is_new_message = data['type'] == 'message_new'
+        is_keyboard_event = 'payload' in data['object']['message']
+        if is_new_message and is_keyboard_event:
+            data['object']['message']['payload'] = json.loads(data['object']['message']['payload'])
+        return data

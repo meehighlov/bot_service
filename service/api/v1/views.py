@@ -26,12 +26,6 @@ def chat_view():
 
     if data['type'] == 'message_new':
 
-        if 'payload' in data['object']['message']:
-            payload = json.loads(data['object']['message']['payload'])
-            command = payload.get('command')
-            if command == 'start':
-                pass  # TODO new user triggered the bot event
-
         user_sender_id = data['object']['message']['from_id']
 
         response, keyboard = get_answer(data)
