@@ -10,7 +10,7 @@ event_types = [
 ]
 
 
-class VKCallBackAPIMessage(Schema):
+class VKCallbackAPIMessage(Schema):
     id_ = fields.Int(load_from='id')
     date = fields.Int(description='время отправки в Unixtime')
     peer_id = fields.Int(descriptin='ид назначения')
@@ -23,16 +23,16 @@ class VKCallBackAPIMessage(Schema):
         unknown = INCLUDE
 
 
-class VKCallBackAPIObject(Schema):
-    message = fields.Nested(VKCallBackAPIMessage)
+class VKCallbackAPIObjectMessage(Schema):
+    message = fields.Nested(VKCallbackAPIMessage)
 
 
-class VKCallBackAPIEvent(Schema):
+class VKChat(Schema):
     type_ = fields.String(
         load_from='type',
         validate=OneOf(event_types)
     )
-    object_ = fields.Nested(VKCallBackAPIObject, load_from='object')
+    object_ = fields.Nested(VKCallbackAPIObjectMessage, load_from='object')
     group_id = fields.Int()
     secret = fields.String()
 

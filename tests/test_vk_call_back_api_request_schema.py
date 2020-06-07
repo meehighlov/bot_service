@@ -1,4 +1,4 @@
-from service.api.serializers.vk_call_back_event import VKCallBackAPIEvent
+from service.api.serializers.vk_call_back_event import VKChat
 
 
 call_back_api_event_data = {
@@ -60,13 +60,13 @@ call_back_api_event_data_with_payload = {
 
 
 def test_vk_api_call_back_request():
-    data = VKCallBackAPIEvent().load(call_back_api_event_data)
+    data = VKChat().load(call_back_api_event_data)
 
     assert data == call_back_api_event_data
 
 
 def test_vk_api_call_back_request_with_payload():
-    data = VKCallBackAPIEvent().load(call_back_api_event_data_with_payload)
+    data = VKChat().load(call_back_api_event_data_with_payload)
 
     assert data == call_back_api_event_data_with_payload
     assert isinstance(data['object']['message']['payload'], dict)

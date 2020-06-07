@@ -1,83 +1,63 @@
+import json
+
 from service.app.config import config
-from service.app.vk.commands import exec_command
-from service.app.vk.users import get_user_by_id
+from service.app.vk.utils import get_random_id
 
 
-class BaseChatScenario:
-
-    name = 'юзер'
-
-    def answer(self, data: dict) -> str:
-        pass
-
-    def keyboard(self):
-        return {
-            "one_time": False,
-            "buttons": [
-                [
-                    {
-                        "action": {
-                            "type": "text",
-                            "payload": {"button": "5"},
-                            "label": "another but"
-                        },
-                        "color": "secondary"
-                    }
-                ],
-                [{
-                    "action": {
-                        "type": "text",
-                        "payload": "{\"button\": \"1\"}",
-                        "label": "Negative"
-                    },
-                    "color": "negative"
-                }, {
-                    "action": {
-                        "type": "text",
-                        "payload": "{\"button\": \"2\"}",
-                        "label": "Positive"
-                    },
-                    "color": "positive"
-                }, {
-                    "action": {
-                        "type": "text",
-                        "payload": "{\"button\": \"2\"}",
-                        "label": "Primary"
-                    },
-                    "color": "primary"
-                }, {
-                    "action": {
-                        "type": "text",
-                        "payload": "{\"button\": \"2\"}",
-                        "label": "Secondary"
-                    },
-                    "color": "secondary"
-                }]
-            ]
-        }
-
-
-class MeScenario(BaseChatScenario):
-
-    name = 'Ваня'
-
-    def answer(self, data: dict) -> str:
-        text = data['object']['message']['text']
-        return exec_command(text)
-
-
-def get_scenario_by_user_id(user_id: str):
+def create_button(**kwargs):
     return {
-        config.MY_VK_ID: MeScenario
-    }.get(user_id)
+        'action': {
+            attr: value
+            for attr, value in kwargs.items()
+        },
+        'color': kwargs.get('color')
+    }
+
+
+def keyboard():
+    return {
+        "one_time": False,
+        "buttons": [
+            [
+                create_button(
+                    type='text',
+                    payload="{'button': '2'}",
+                    label='wow',
+                    color='secondary'
+                )
+            ],
+            [
+                create_button(
+                    type='text',
+                    payload="{'button': '1'}",
+                    label='hey',
+                    color='positive'
+                ),
+                create_button(
+                    type='text',
+                    payload="{'button': '0'}",
+                    label='path',
+                    color='negative'
+                )
+            ]
+        ]
+    }
 
 
 def get_answer(request_data: dict):
-    user_sender_id = request_data['object']['message']['from_id']
-    scenario = get_scenario_by_user_id(f'{user_sender_id}')()
+    response = 'mocked message'  # temporary stub for any message
 
-    answer = 'mocked message'
+    response_data = {
+        'message': response,
+        'peer_id': request_data['object']['message']['from_id'],
+        'access_token': config.BOT_TOKEN,
+        'v': config.VK_API_VERSION,
+        'random_id': get_random_id()
+    }
 
-    # user_sender_data = get_user_by_id(user_sender_id)
+    if 'payload' in request_data['object']['message']:
+        response_data.update({
+            'keyboard': json.dumps(keyboard())
+        })
 
-    return answer, scenario.keyboard()
+    return response_data
