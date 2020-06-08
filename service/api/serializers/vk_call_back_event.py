@@ -6,7 +6,8 @@ from marshmallow.validate import OneOf
 
 event_types = [
     'message_new',
-    'confirmation'
+    'confirmation',
+    # 'message_reply'
 ]
 
 
@@ -41,8 +42,12 @@ class VKChat(Schema):
 
     @post_load
     def extract_payload(self, data, **kwargs):
-        is_new_message = data['type'] == 'message_new'
+        if data['type'] == 'confirmation':
+            return data
+
+        print('schema data', data)
+
         is_keyboard_event = 'payload' in data['object']['message']
-        if is_new_message and is_keyboard_event:
+        if is_keyboard_event:
             data['object']['message']['payload'] = json.loads(data['object']['message']['payload'])
         return data

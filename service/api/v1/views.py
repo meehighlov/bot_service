@@ -22,6 +22,7 @@ def chat_view():
         return config.CONFIRMATION_CODE
 
     params = get_answer(data)
+    print('data', data)
     requests.get(f'{config.VK_API_URL}messages.send', params=params)
 
     return 'ok'
