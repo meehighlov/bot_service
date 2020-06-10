@@ -1,12 +1,11 @@
-import requests
-
 from service.api.serializers.vk_call_back_event import VKChatSchema
 from service.api.v1.blueprint import v1_blueprint
 from flask import jsonify
 from flask import request
 
 from service.app.config import config
-from service.app.vk.chat_scenario import get_answer
+from service.app.chat_scenario import get_answer
+from service.app.vk.client import call
 
 
 @v1_blueprint.route('/health', methods=['GET'])
@@ -41,6 +40,7 @@ def chat_view():
     print('request_data', data)
     params = get_answer(data)
     print('params', params)
-    requests.get(f'{config.VK_API_URL}messages.send', params=params)
+
+    call('message.send', params=params)
 
     return 'ok'
