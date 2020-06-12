@@ -1,31 +1,9 @@
 import json
+import os
 
+from service.app.bot_options.love_calculator import love_calculator_scenario, love_calculator_context_handler
+from service.app.exceptions import ContextError
 from service.app.vk.utils import get_random_id
-
-
-class CommonChat:
-
-    mocked_response = 'I got you, but now i\'m busy holding my thoughts together'
-
-    def _keyboard(self):
-        return json.dumps([])
-
-    def get_answer(self, data):
-        return {
-            'message': self.mocked_response,
-            'peer_id': data['object']['message']['from_id'],
-            'keyboard': self._keyboard(),
-            'random_id': get_random_id()
-        }
-
-
-class LoveCalculator:
-
-    def get_answer(self):
-        return {
-            'message': 'Введите два имени через пробел: Имя1 Имя2',
-            'keyboard': {'buttons': [], 'one_time': True}
-        }
 
 
 def create_button(**kwargs):
@@ -37,12 +15,12 @@ def create_button(**kwargs):
     }
 
     return {
-        **action,
+        'action': action,
         **color
     }
 
 
-def keyboard():
+def start_keyboard():
     return {
         "one_time": False,
         'inline': False,
@@ -50,35 +28,55 @@ def keyboard():
             [
                 create_button(
                     type='text',
-                    payload="{\"scenario\": \"1\"}",
-                    label='Love calculator'
+                    payload="{\"button\": \"1\"}",
+                    label='Love calculator',
+                    color='primary'
                 )
             ]
         ]
     }
 
 
+def get_context_handler(func_name):
+    try:
+        func = {
+            'love_calculator_context_handler': love_calculator_context_handler
+        }[func_name]
+    except KeyError:
+        raise ContextError
+    return func
+
+
 def get_answer(request_data: dict):
+    peer_id = request_data['object']['message']['from_id']
     response_data = {
-        'peer_id': request_data['object']['message']['from_id'],
+        'message': 'mocked message',
+        'keyboard': json.dumps(start_keyboard()),
+        'peer_id': peer_id,
         'random_id': get_random_id()
     }
 
-    payload = request_data.get('payload')
+    context = os.getenv(f'{peer_id}_next_func')
 
-    if payload is None:
-        pass
+    if context:
+        func = get_context_handler(context)
+        response = func(request_data)
 
-    scenario_number = payload['button']
+        response_data.update(**response)
+        return response_data
+
+    button = None
+
+    if 'payload' in request_data['object']['message']:
+        payload = request_data['object']['message']['payload']
+        button = payload['button']
 
     scenario = {
-        '1': LoveCalculator
-    }.get(scenario_number)
+        '1': love_calculator_scenario
+    }.get(button)
 
-    response_data.update(
-        scenario().get_answer()
-    )
-
-    # TODO handle dialog context!
+    if scenario:
+        response = scenario(request_data)
+        response_data.update(**response)
 
     return response_data

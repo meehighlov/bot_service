@@ -41,6 +41,6 @@ def chat_view():
     params = get_answer(data)
     print('params', params)
 
-    call('message.send', params=params)
+    call('messages.send', params=params)
 
     return 'ok'
