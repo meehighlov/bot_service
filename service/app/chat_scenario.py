@@ -1,8 +1,7 @@
 import json
-import os
 
-from service.app.bot_options.love_calculator import love_calculator_scenario, love_calculator_context_handler
-from service.app.exceptions import ContextError
+from service.app.commands import execute_command
+from service.app.exceptions import CommandError, ExternalServiceCallError, BaseError
 from service.app.vk.utils import get_random_id
 
 
@@ -29,22 +28,12 @@ def start_keyboard():
                 create_button(
                     type='text',
                     payload="{\"button\": \"1\"}",
-                    label='Love calculator',
-                    color='primary'
+                    label='кнопуля пока не робит',
+                    color='positive'
                 )
             ]
         ]
     }
-
-
-def get_context_handler(func_name):
-    try:
-        func = {
-            'love_calculator_context_handler': love_calculator_context_handler
-        }[func_name]
-    except KeyError:
-        raise ContextError
-    return func
 
 
 def get_answer(request_data: dict):
@@ -56,27 +45,21 @@ def get_answer(request_data: dict):
         'random_id': get_random_id()
     }
 
-    context = os.getenv(f'{peer_id}_next_func')
+    message_text = request_data['object']['message']['text']
 
-    if context:
-        func = get_context_handler(context)
-        response = func(request_data)
+    try:
+        message = execute_command(message_text)
+    except CommandError as ce:
+        message = f'Error during command execution - {ce.context}'
+    except ExternalServiceCallError as esce:
+        message = f'Service {esce.context} not available'
+    except BaseError as be:
+        print(be)
+        message = f'Something strange happen'
+    except Exception as e:
+        print(e)
+        message = f'WOW, something really goes bad'
 
-        response_data.update(**response)
-        return response_data
-
-    button = None
-
-    if 'payload' in request_data['object']['message']:
-        payload = request_data['object']['message']['payload']
-        button = payload['button']
-
-    scenario = {
-        '1': love_calculator_scenario
-    }.get(button)
-
-    if scenario:
-        response = scenario(request_data)
-        response_data.update(**response)
+    response_data.update({'message': message})
 
     return response_data

@@ -1,75 +1,30 @@
-import json
-import os
-
 import requests
 
-from service.app.exceptions import WrongParametersFormatError
+from service.app.config import config
+from service.app.exceptions import ParseCommandParamsError, ExternalServiceCallError
 
 
-def create_button(**kwargs):
-    color = {'color': kwargs.pop('color')} if 'color' in kwargs else {}
-
-    action = {
-        attr: value
-        for attr, value in kwargs.items()
-    }
-
-    return {
-        'action': action,
-        **color
-    }
-
-
-def start_keyboard():
-    return {
-        "one_time": False,
-        'inline': False,
-        "buttons": [
-            [
-                create_button(
-                    type='text',
-                    payload="{\"button\": \"1\"}",
-                    label='Love calculator',
-                    color='primary'
-                )
-            ]
-        ]
-    }
-
-
-def on_start():
-    return {
-        'message': 'Enter two space separated names: first_name second_name',
-        'keyboard': json.dumps({'buttons': [], 'one_time': True})
-    }
-
-
-def love_calculator_context_handler(request_data):
-
-    peer_id = request_data['object']['message']['from_id']
-
-    func_params = request_data['object']['message']['text']
-
-    try:
-        params = pre_process_data(func_params)
-    except WrongParametersFormatError:
-        return on_start()
+def love_calculator(fname, sname):
 
     params = {
-        'fname': params['fname'],
-        'sname': params['sname']
+        'fname': fname,
+        'sname': sname
     }
 
     headers = {
-        'x-rapidapi-host': "love-calculator.p.rapidapi.com",
-        'x-rapidapi-key': "b9719c2e03mshd73af3a9902256bp1117b7jsn39bc6df975c6"
+        'x-rapidapi-host': config.X_RAPIDAPI_HOST,
+        'x-rapidapi-key': config.X_RAPIDAPI_KEY
     }
 
-    r = requests.get(
-        'https://love-calculator.p.rapidapi.com/getPercentage',
-        params=params,
-        headers=headers
-    )
+    try:
+        r = requests.get(
+            'https://love-calculator.p.rapidapi.com/getPercentage',
+            params=params,
+            headers=headers
+        )
+    except Exception as e:
+        print(e)
+        raise ExternalServiceCallError(context=e)
 
     data = r.json()
 
@@ -77,30 +32,18 @@ def love_calculator_context_handler(request_data):
         f'% for {data["fname"]} and {data["sname"]} is {data["percentage"]}, {data["result"]}'
     )
 
-    os.environ.pop(f'{peer_id}_next_func', None)
-
-    return {
-        'message': message,
-        'keyboard': json.dumps(start_keyboard())
-    }
+    return message
 
 
-def pre_process_data(data: str = None):
-    if data is None:
-        return {}
+def love_calculator_handler(params: list) -> str:
+    """
+    :param params: list of params, expect: ['fname', 'sname']
+    :return: response message
+    """
+
     try:
-        first_name, second_name = data.split()
+        fname, sname = params
     except ValueError:
-        raise WrongParametersFormatError
-    return {
-        'fname': first_name,
-        'sname': second_name
-    }
+        raise ParseCommandParamsError(context='Love calculator')
 
-
-def love_calculator_scenario(request_data):
-    peer_id = request_data['object']['message']['from_id']
-
-    os.environ[f'{peer_id}_next_func'] = 'love_calculator_context_handler'
-
-    return on_start()
+    return love_calculator(fname, sname)

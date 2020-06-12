@@ -16,9 +16,8 @@ class Config:
     VK_API_VERSION = os.getenv('VK_API_VERSION')
     MY_VK_ID = os.getenv('MY_VK_ID')
 
-    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-    WORKER_SLEEP_TIME_SECONDS_DEFAULT = 60 * 60 * 24 * 3  # three days
-    WORKER_SLEEP_TIME_SECONDS = int(os.getenv('WORKER_SLEEP_TIME_SECONDS', WORKER_SLEEP_TIME_SECONDS_DEFAULT))
+    X_RAPIDAPI_HOST = os.getenv('X_RAPIDAPI_HOST')
+    X_RAPIDAPI_KEY = os.getenv('X_RAPIDAPI_KEY')
 
 
 config = Config()
