@@ -2,6 +2,7 @@ import json
 
 from service.app.commands import execute_command
 from service.app.exceptions import CommandError, ExternalServiceCallError, BaseError
+from service.app.vk.users import get_user_by_id
 from service.app.vk.utils import get_random_id
 
 
@@ -19,7 +20,7 @@ def create_button(**kwargs):
     }
 
 
-def start_keyboard():
+def keyboard():
     return {
         "one_time": False,
         'inline': False,
@@ -27,8 +28,8 @@ def start_keyboard():
             [
                 create_button(
                     type='text',
-                    payload="{\"button\": \"1\"}",
-                    label='кнопуля пока не робит',
+                    payload="{\"command\": \"!commands\"}",
+                    label='Commands list',
                     color='positive'
                 )
             ]
@@ -40,12 +41,30 @@ def get_answer(request_data: dict):
     peer_id = request_data['object']['message']['from_id']
     response_data = {
         'message': 'mocked message',
-        'keyboard': json.dumps(start_keyboard()),
+        'keyboard': json.dumps(keyboard()),
         'peer_id': peer_id,
         'random_id': get_random_id()
     }
 
     message_text = request_data['object']['message']['text']
+
+    if 'payload' in request_data['object']['message']:
+        payload = request_data['object']['message']['payload']
+
+        if payload['command'].lower() == 'start':
+            user = get_user_by_id(peer_id)
+
+            user_name = user.get('first_name')
+            message_text = f'Hey, {user_name}, stay cool, thanks for joining (>_<)'
+
+            response_data.update({
+                'message': message_text,
+                'keyboard': json.dumps(keyboard())
+            })
+
+            return response_data
+
+        message_text = payload['command']
 
     try:
         message = execute_command(message_text)

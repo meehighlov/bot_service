@@ -1,6 +1,6 @@
 import json
 
-from marshmallow import Schema, fields, INCLUDE, post_load, EXCLUDE
+from marshmallow import Schema, fields, EXCLUDE
 from marshmallow.validate import OneOf
 
 
@@ -8,9 +8,7 @@ event_types = [
     'message_new',
     'confirmation',
     'message_reply',
-
-    # TODO handle those types in future
-    # 'group_join'
+    'group_join'
 ]
 
 
@@ -28,7 +26,7 @@ class VKCallbackAPIMessageSchema(Schema):
 
 
 class VKCallbackAPIObjectMessageSchema(Schema):
-    message = fields.Nested(lambda: VKCallbackAPIMessageSchema())
+    message = fields.Nested(VKCallbackAPIMessageSchema)
 
     class Meta:
         unknown = EXCLUDE
@@ -38,7 +36,7 @@ class VKChatSchema(Schema):
     type = fields.String(
         validate=OneOf(event_types)
     )
-    object = fields.Nested(lambda: VKCallbackAPIObjectMessageSchema())
+    object = fields.Nested(VKCallbackAPIObjectMessageSchema)
     group_id = fields.Int()
     secret = fields.String()
 

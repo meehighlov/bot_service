@@ -29,7 +29,7 @@ def love_calculator(fname, sname):
     data = r.json()
 
     message = (
-        f'% for {data["fname"]} and {data["sname"]} is {data["percentage"]}, {data["result"]}'
+        f'{data["percentage"]}% compatibility, {data["result"]}'
     )
 
     return message

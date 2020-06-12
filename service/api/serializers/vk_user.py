@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 
 
 class VKUserSchema(Schema):
-    id_ = fields.Int(allow_none=True, load_from='id')
+    id = fields.Int(allow_none=True)
     first_name = fields.String(allow_none=True)
     last_name = fields.String(allow_none=True)
     is_closed = fields.Boolean(allow_none=True)
@@ -10,4 +10,4 @@ class VKUserSchema(Schema):
 
 
 class VKUsersSchema(Schema):
-    response = fields.List(fields.Nested(VKUserSchema))
+    response = fields.List(fields.Nested(VKUserSchema), required=True)

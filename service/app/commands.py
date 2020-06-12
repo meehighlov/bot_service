@@ -1,18 +1,38 @@
 """
     syntax
 
-    :comand [op1 op2 ... opN]
+    :command[ op1 op2 ... opN]
 
 """
-from service.app.bot_options import commands_handlers
+from service.app.bot_options.love_calculator import love_calculator_handler
 from service.app.exceptions import NotACommandError, CommandNotFoundError
 
 
+commands_description = {
+    'lc': (
+        'usage !lc first_name second_name '
+        'shows % of names compatibility'
+    )
+}
+
+
+def commands_list(*args, **kwargs):
+    return '\n'.join([
+        f'command {command}\n{desc}' for command, desc in commands_description.items()
+    ])
+
+
+commands_handlers = {
+    'lc': love_calculator_handler,
+    'commands': commands_list
+}
+
+
 def parse_command(message_text: str):
-    if not message_text.startswith(':'):
+    if not message_text.startswith('!'):
         raise NotACommandError(context='Not valid command notation')
 
-    message_text = message_text.replace(':', '')
+    message_text = message_text.replace('!', '')
 
     command, *params = message_text.split()
 

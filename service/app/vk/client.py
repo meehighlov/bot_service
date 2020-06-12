@@ -12,6 +12,7 @@ def call(method, params):
     params_.update(**params)
 
     try:
+        print('request params:', params_)
         r = requests.get(f'{config.VK_API_URL}{method}', params=params_)
         print('response:', r.json())
     except Exception as e:

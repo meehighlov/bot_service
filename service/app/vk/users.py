@@ -1,9 +1,6 @@
-import requests
-
 from service.api.serializers.vk_user import VKUsersSchema
-from service.app.config import config
-
-url_tail = 'users.get'
+from service.app.vk.client import call
+from service.app.vk.utils import get_random_id
 
 
 def get_user_by_id(user_id):
@@ -18,11 +15,10 @@ def get_user_by_id(user_id):
     user_id = str(user_id)
     params = {
         'user_id': user_id,
-        'access_token': config.BOT_TOKEN,
-        'v': config.VK_API_VERSION,
-        'random_id': '0'
+        'random_id': get_random_id(),
     }
 
-    response = requests.get(f'{config.VK_API_URL}{url_tail}', params=params)
+    response = call(method='users.get', params=params)
 
-    return VKUsersSchema().load(response.json())
+    data = VKUsersSchema().load(response.json())
+    return data['response'][0]
