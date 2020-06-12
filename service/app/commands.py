@@ -1,7 +1,7 @@
 """
     syntax
 
-    :command[ op1 op2 ... opN]
+    !command[ op1 op2 ... opN]
 
 """
 from service.app.bot_options.love_calculator import love_calculator_handler
