@@ -12,6 +12,17 @@ event_types = [
 ]
 
 
+class VKEventSchema(Schema):
+    type = fields.String(
+        validate=OneOf(event_types)
+    )
+    group_id = fields.Int()
+    secret = fields.String()
+
+    class Meta:
+        unknown = EXCLUDE
+
+
 class VKCallbackAPIMessageSchema(Schema):
     id = fields.Int()
     date = fields.Int(description='время отправки в Unixtime')
@@ -32,13 +43,14 @@ class VKCallbackAPIObjectMessageSchema(Schema):
         unknown = EXCLUDE
 
 
-class VKChatSchema(Schema):
-    type = fields.String(
-        validate=OneOf(event_types)
-    )
+class VKChatSchema(VKEventSchema):
     object = fields.Nested(VKCallbackAPIObjectMessageSchema)
-    group_id = fields.Int()
-    secret = fields.String()
 
-    class Meta:
-        unknown = EXCLUDE
+
+class VKGroupJoinObjectSchema(Schema):
+    user_id = fields.Integer()
+    join_type = fields.String()
+
+
+class VKGroupJoinSchema(VKEventSchema):
+    object = fields.Nested(VKGroupJoinObjectSchema)

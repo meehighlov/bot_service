@@ -38,32 +38,10 @@ def keyboard():
 
 
 def get_answer(request_data: dict):
-    peer_id = request_data['object']['message']['from_id']
-    response_data = {
-        'message': 'mocked message',
-        'keyboard': json.dumps(keyboard()),
-        'peer_id': peer_id,
-        'random_id': get_random_id()
-    }
-
     message_text = request_data['object']['message']['text']
 
     if 'payload' in request_data['object']['message']:
         payload = request_data['object']['message']['payload']
-
-        if payload['command'].lower() == 'start':
-            user = get_user_by_id(peer_id)
-
-            user_name = user.get('first_name')
-            message_text = f'Hey, {user_name}, stay cool, thanks for joining (>_<)'
-
-            response_data.update({
-                'message': message_text,
-                'keyboard': json.dumps(keyboard())
-            })
-
-            return response_data
-
         message_text = payload['command']
 
     try:
@@ -79,6 +57,28 @@ def get_answer(request_data: dict):
         print(e)
         message = f'WOW, something really goes bad'
 
-    response_data.update({'message': message})
+    return {
+        'message': message,
+        'keyboard': json.dumps(keyboard()),
+        'peer_id': request_data['object']['message']['from_id'],
+        'random_id': get_random_id()
+    }
 
-    return response_data
+
+def group_join_answer(request_data):
+    peer_id = request_data['object']['user_id']
+
+    try:
+        user = get_user_by_id(peer_id)
+    except ExternalServiceCallError:
+        user = {'first_name': 'user'}
+
+    user_name = user.get('first_name')
+    message_text = f'Hey, {user_name}, stay cool, thanks for joining (^_^)'
+
+    return {
+        'message': message_text,
+        'keyboard': json.dumps(keyboard()),
+        'peer_id': peer_id,
+        'random_id': get_random_id()
+    }

@@ -1,4 +1,5 @@
 from service.api.serializers.vk_user import VKUsersSchema
+from service.app.exceptions import ExternalServiceCallError
 from service.app.vk.client import call
 from service.app.vk.utils import get_random_id
 
@@ -18,7 +19,10 @@ def get_user_by_id(user_id):
         'random_id': get_random_id(),
     }
 
-    response = call(method='users.get', params=params)
+    try:
+        response = call(method='users.get', params=params)
+    except Exception:
+        raise ExternalServiceCallError(context='Fail on getting user data')
 
     data = VKUsersSchema().load(response.json())
     return data['response'][0]
