@@ -4,7 +4,10 @@
     !command[ op1 op2 ... opN]
 
 """
+import typing as t
+
 from service.app.bot_options.love_calculator import love_calculator_handler
+from service.app.bot_options.random_numbers import random_number
 from service.app.exceptions import NotACommandError, CommandNotFoundError
 
 
@@ -24,7 +27,8 @@ def commands_list(*args, **kwargs):
 
 commands_handlers = {
     'lc': love_calculator_handler,
-    'commands': commands_list
+    'rnd': random_number
+    # 'commands': commands_list
 }
 
 
@@ -39,7 +43,9 @@ def parse_command(message_text: str):
     return command, params
 
 
-def execute_command(message_text):
+def execute_command(message_text: str):
+    command: str
+    params: list
     command, params = parse_command(message_text)
 
     handler = commands_handlers.get(command)
