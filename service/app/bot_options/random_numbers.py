@@ -11,8 +11,8 @@ def random_number(params):
         raise ParseCommandParamsError(context='Random number: pars params error')
 
     try:
-        a, b = float(a), float(b)
+        a, b = int(float(a)), int(float(b))
     except ValueError:
         raise ParseCommandParamsError(context=f'Random number: only numbers allowed')
 
-    return random.uniform(a, b)
+    return random.randint(a, b)
